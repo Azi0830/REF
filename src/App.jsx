@@ -11,6 +11,9 @@ function App() {
   const [runnig, setRunning] = useState(false);
   const [lap, setLap] = useState([]);
 
+  const [inputValue, setInputValue] = useState("");
+  const [savedValue, setSavedValue] = useState("");
+
   //input Modal Lap
   const [inputModal, setInputModal] = useState(false);
   const showInput = () => {
@@ -19,9 +22,19 @@ function App() {
   const handOk = () => {
     setInputModal(false);
     onLap();
+    handleSaveClick();
   };
   const handCancel = () => {
     setInputModal(false);
+  };
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value); // Input qiymatini yangilash
+  };
+
+  const handleSaveClick = () => {
+    setSavedValue(inputValue); // Saqlangan qiymatni yangilash
+    setInputValue(""); // Input qiymatini tozalash
   };
 
   // Restar Modal
@@ -38,7 +51,7 @@ function App() {
   };
 
   const changeMilsecond = (previous) => {
-    if (previous === 99) {
+    if (previous === 59) {
       setSecond(changeSecond);
       return 0;
     }
@@ -67,7 +80,7 @@ function App() {
     if (runnig)
       timeRef.current = setInterval(() => {
         setMilsecond(changeMilsecond);
-      }, 1);
+      }, 10);
     else clearInterval(timeRef.current);
   }, [runnig]);
 
@@ -88,6 +101,7 @@ function App() {
           minute,
           second,
           milsecond,
+          name: savedValue,
           id: uuidv4(),
         },
       ];
@@ -107,13 +121,13 @@ function App() {
     <div className="w-[100%] h-[100vh] flex items-center justify-center ">
       <div className="bg-rose-500 w-[60%] h-[80vh]">
         <div className="text-[200px] flex items-center justify-center">
-          <h1>{hour} </h1>
+          <h1>{hour < 10 ? `0${hour}` : hour} </h1>
           <h1>:</h1>
-          <h1>{minute} </h1>
+          <h1>{minute < 10 ? `0${minute}` : minute} </h1>
           <h1>:</h1>
-          <h1>{second}</h1>
-          <h1>:</h1>
-          <h1>{milsecond}</h1>
+          <h1>{second < 10 ? `0${second}` : second}</h1>
+          <h1>.</h1>
+          <h1>{milsecond < 10 ? `0${milsecond}` : milsecond}</h1>
         </div>
         <div className="flex items-center justify-center gap-[100px]">
           {milsecond ? (
@@ -136,9 +150,12 @@ function App() {
             onCancel={handCancel}
           >
             <input
+              value={inputValue}
+              onChange={handleInputChange}
+              required
               className="border-double border-4 border-indigo-600 "
               type="text"
-              placeholder="kim..."
+              placeholder=" name..."
             />
           </Modal>
           {runnig ? (
@@ -164,20 +181,22 @@ function App() {
             Restart
           </Button>
           <Modal
-            title="Vaqtni to'xtatamizmi!"
+            title="Vaqtni to'xtatamizmi!!!"
             open={isModalOpen}
             onOk={handleOk}
             onCancel={handleCancel}
           >
-            <p>Sen chindanham uchirishni xohlaysanmi..???</p>
+            <p>
+              Vaqt ish jarayonida. Siz chindanham to'xtatishni xohlaysinmi..???
+            </p>
           </Modal>
         </div>
         <div className="w-full">
-          {lap.map(({ id, hour, minute, second, milsecond }) => {
+          {lap.map(({ id, hour, minute, second, milsecond, name }) => {
             return (
               <div key={id} className="flex ml-7">
                 <h3>{hour}</h3>:<h3>{minute}</h3>:<h3>{second}</h3>:
-                <h3>{milsecond}</h3>
+                <h3>{milsecond}</h3>: <h3>{name}</h3>
               </div>
             );
           })}
